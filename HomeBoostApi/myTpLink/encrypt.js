@@ -213,12 +213,21 @@ function utf8_encode(string) {
 
 const auth = escape("Basic " + Base64Encoding(credentials.login + ":" + hex_md5(credentials.password)));
 
+function selectKey(stringFromApi) {
+    console.log(stringFromApi)
+    let firstMatch = stringFromApi.match(/192.168.0.1\/[A-Z0-9]*\/userRpm/);
+    let key = firstMatch[0].match(/\/[A-Z0-9]*\//)[0];
+    key = key.slice(1, key.length - 1);
 
-async function getSessionKey(authKeySession) {
+    return key;
+}
+
+
+async function getSessionKey() {
 
     const config = {
         method: 'get',
-        url: 'http://192.168.0.1/userRpm/LoginRpm.htm?Save=Save HTTP/1.1',
+        url: 'http://192.168.0.1/userRpm/LoginRpm.htm?Save=Save',
         headers: {
             'Host': '192.168.0.1',
             'Connection': 'keep-alive',
@@ -227,25 +236,20 @@ async function getSessionKey(authKeySession) {
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Cookie': 'Authorization=' + authKeySession
+            'Cookie': 'Authorization=' + auth
         }
     }
 
     let res = await axios(config);
-
-
-    let firstMatch = res.data.match(/192.168.0.1\/[A-Z0-9]*\/userRpm/);
-    let key = firstMatch[0].match(/\/[A-Z0-9]*\//)[0];
-    key = key.slice(1, key.length - 1);
-
+    let key = await selectKey(res.data);
+    
     return key;
-
 }
 
 
-async function resetRouter(authKey) {
+async function resetRouter() {
 
-    const key = await getSessionKey(authKey);
+    const key = await getSessionKey();
 
     const config = {
         method: 'get',
@@ -259,12 +263,15 @@ async function resetRouter(authKey) {
             'Referer': 'http://192.168.0.1/' + key + '/userRpm/SysRebootRpm.htm',
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Language': 'pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7',
-            'Cookie': 'Authorization=' + authKey
+            'Cookie': 'Authorization=' + auth
         }
     }
 
     let res = await axios(config);
 
+
 }
 
-resetRouter(auth)
+//getSessionKey()
+
+exports.resetRouter = resetRouter;
