@@ -209,22 +209,36 @@ function utf8_encode(string) {
     return utftext;
 }
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const auth = escape("Basic " + Base64Encoding(credentials.login + ":" + hex_md5(credentials.password)));
 
-function selectKey(stringFromApi) {
-    console.log(stringFromApi)
-    let firstMatch = stringFromApi.match(/192.168.0.1\/[A-Z0-9]*\/userRpm/);
-    let key = firstMatch[0].match(/\/[A-Z0-9]*\//)[0];
+async function selectKey() {
+    let firstMatch = "";
+    let counter = 0;
+    do{
+    let stringFromApi = await getSessionKey();
+    firstMatch = stringFromApi.data.match(/192.168.0.1\/[A-Z0-9]*\/userRpm/);
+    counter++;
+    console.log("API KEY REQUSET COUNT: " + counter);
+    }while(firstMatch == null && counter < 3)
+    
+    key = firstMatch[0].match(/\/[A-Z0-9]*\//)[0];
     key = key.slice(1, key.length - 1);
-
+    console.log(key)
     return key;
 }
 
+async function selectIsOn(stringFromApi) {
+    
+    let isOn = stringFromApi.match(/access_global_cfg_dyn_array = new Array\(\n[0-1]\,/)[0];
+    isOn = isOn[isOn.length-2];
+    if(isOn === 1) isOn = true; else isOn = false;
+
+    return isOn;
+}
 
 async function getSessionKey() {
-
     const config = {
         method: 'get',
         url: 'http://192.168.0.1/userRpm/LoginRpm.htm?Save=Save',
@@ -240,16 +254,13 @@ async function getSessionKey() {
         }
     }
 
-    let res = await axios(config);
-    let key = await selectKey(res.data);
-    
-    return key;
+    return axios(config);
 }
 
 
 async function resetRouter() {
 
-    const key = await getSessionKey();
+    key = await selectKey();
 
     const config = {
         method: 'get',
@@ -267,11 +278,61 @@ async function resetRouter() {
         }
     }
 
-    let res = await axios(config);
-
+    //let res = await axios(config);
+    console.log("reseted")
 
 }
 
+async function checkIsOn() {
+    
+    key = await selectKey();
+
+    const config = {
+        method: 'get',
+        url: 'http://192.168.0.1/' + key + '/userRpm/AccessCtrlAccessRulesRpm.htm',
+        headers: {
+            'Host': '192.168.0.1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Referer': 'http://192.168.0.1/' + key + '/userRpm/SysRebootRpm.htm',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Language': 'pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Cookie': 'Authorization=' + auth
+        }
+    }
+
+    let res = await axios(config);
+    let isOn = await selectIsOn(res.data);
+
+    return "sdadas";
+}
+
+async function internetMenage(option) {
+    
+    key = await selectKey();
+
+    const config = {
+        method: 'get',
+        url: 'http://192.168.0.1/' + key + '/userRpm/AccessCtrlAccessRulesRpm.htm?enableCtrl=' + option + '&defRule=0&Page=1',
+        headers: {
+            'Host': '192.168.0.1',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Referer': 'http://192.168.0.1/' + key + '/userRpm/SysRebootRpm.htm',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Language': 'pl-PL,pl;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Cookie': 'Authorization=' + auth
+        }
+    }
+
+    let res = await axios(config);
+}
 //getSessionKey()
 
 exports.resetRouter = resetRouter;
+exports.internetMenage = internetMenage;
+exports.checkIsOn = checkIsOn;

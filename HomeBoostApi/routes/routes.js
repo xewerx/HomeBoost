@@ -10,7 +10,9 @@ router.get('/volumeminus', myPC.volumeMinus);
 router.get('/shutdown', myPC.shutDown);
 
 router.get('/reboot', myRouter.reboot);
-//router.get('/internetoff', myRouter.internetOff);
+router.get('/internetoff', myRouter.internetOff);
+router.get('/interneton', myRouter.internetOn);
+router.get('/checkison', myRouter.checkIsOn);
 
 
 module.exports = router;
