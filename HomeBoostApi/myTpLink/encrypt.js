@@ -233,7 +233,7 @@ async function selectIsOn(stringFromApi) {
     
     let isOn = stringFromApi.match(/access_global_cfg_dyn_array = new Array\(\n[0-1]\,/)[0];
     isOn = isOn[isOn.length-2];
-    if(isOn === 1) isOn = true; else isOn = false;
+    if(isOn == 1) isOn = true; else isOn = false;
 
     return isOn;
 }
@@ -305,8 +305,8 @@ async function checkIsOn() {
 
     let res = await axios(config);
     let isOn = await selectIsOn(res.data);
-
-    return "sdadas";
+    
+    return isOn;
 }
 
 async function internetMenage(option) {

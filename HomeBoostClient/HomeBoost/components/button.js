@@ -16,7 +16,7 @@ const Buttons = props => {
 
 const styles = StyleSheet.create({
     container: {
-      backgroundColor: 'red',
+      backgroundColor: '#0AC237',
       height: 50,
       width: 200,
       borderRadius: 40,

@@ -3,9 +3,7 @@ import React from 'react';
 import { SafeAreaView, StyleSheet, Text } from 'react-native';
 import Navigator from './routes/stack';
 
-function clicked() {
-  console.log("DUPA");
-}
+
 
 export default function App() {
   return (

@@ -25,7 +25,10 @@ exports.internetOn = (req, res) => {
 
 exports.checkIsOn = (req, res) => {
 
-    console.log(checkIsOn() + "routereeee")
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.send("OK");
+    checkIsOn().then(x => {
+        console.log("ISON:" + x);
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.send("ISON:" + x);
+    })
+    
 };
