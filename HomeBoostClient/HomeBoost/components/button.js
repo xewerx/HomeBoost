@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
   
-
 const Buttons = props => {
     const {container} = styles;
     const {fun} = props;

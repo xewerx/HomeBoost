@@ -1,6 +1,5 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { SafeAreaView, StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import Navigator from './routes/stack';
 
 
